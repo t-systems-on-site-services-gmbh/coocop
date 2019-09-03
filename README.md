@@ -1,1 +1,1 @@
-# coocop
+# COOCOP - Copyout and CopyPaiting implementation
