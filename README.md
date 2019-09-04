@@ -3,7 +3,7 @@ This is an implementation of the Copyout and CopyPairing image augmentation tech
 
 ## Citation / BibTeX
 This is how you can cite this work with LaTeX / BibTeX:
-```
+```latex
 @article{Copyout,
 title = "{Improved Image Augmentation for Convolutional Neural Networks by Copyout and CopyPairing}",
 author = {Philip May},
