@@ -121,7 +121,7 @@ class CopyPairing(tensorflow.keras.callbacks.Callback):
         self.cop_count = 0
         self.current_epoch = 0
 
-    def copyout(img, old_img):
+    def copyout(self, img, old_img):
         h, w, _ = img.shape
 
         x = np.random.randint(w)
@@ -158,21 +158,17 @@ class CopyPairing(tensorflow.keras.callbacks.Callback):
                 old_img = self.image_buffer[image_buffer_index]
             if self.current_epoch < self.warmup_epochs:
                 # Copyout
-                print('warmup', self.current_epoch)
-                img = copyout(img, old_img)
+                img = self.copyout(img, old_img)
             elif self.current_epoch > self.fine_tuning_epoch - 2:
                 # Copyout
-                print('fine_tuning', self.current_epoch)
-                img = copyout(img, old_img)
+                img = self.copyout(img, old_img)
             else:
                 if self.coo_count <= self.coo_epochs - 1:
                     # Copyout
-                    print('mix coo++', current_epoch, '-', self.coo_count)
-                    img = copyout(img, old_img)
+                    img = self.copyout(img, old_img)
                     self.coo_count += 1
                 elif self.cop_count <= self.cop_epochs - 1:
                     # SamplePairing
-                    print('mix cop##', current_epoch, '-', self.cop_count)
                     img = np.mean(np.array([img, old_img]), axis=0)
 
                     self.cop_count += 1
