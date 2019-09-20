@@ -83,7 +83,7 @@ class Copyout:
 # TODO maybe add SamplePairing and Cutout implementations later
 
 
-class CopyPairing(keras.callbacks.Callback):
+class CopyPairing(tensorflow.keras.callbacks.Callback):
 
     def __init__(self, extent,
                  warmup_epochs, fine_tuning_epoch, coo_epochs, cop_epochs,
