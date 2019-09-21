@@ -9,7 +9,7 @@ setuptools.setup(
     maintainer="Philip May",
     author="Philip May",
     author_email="pm@eniak.de",
-    description="Copyout and CopyPaiting",
+    description="Copyout and CopyPaiting Image Augmentation",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/t-systems-on-site-services-gmbh/coocop",
