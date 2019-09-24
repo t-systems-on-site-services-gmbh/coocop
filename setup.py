@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="coocop",
-    version="0.1.dev2",
+    version="0.2",
     maintainer="Philip May",
     author="Philip May",
     author_email="pm@eniak.de",
