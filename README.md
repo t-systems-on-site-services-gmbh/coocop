@@ -1,6 +1,17 @@
 # COOCOP - Copyout and CopyPaiting implementation
 This is an implementation of the Copyout and CopyPairing image augmentation techniques. The paper about this can be found here: [Improved Image Augmentation for Convolutional Neural Networks by Copyout and CopyPairing](https://arxiv.org/abs/1909.00390)
 
+## Installation
+Install or update with pip:
+```
+pip install coocop -U
+```
+
+Install development version:
+```
+pip install git+https://github.com/t-systems-on-site-services-gmbh/coocop.git -U
+```
+
 ## Citation / BibTeX
 This is how you can cite this work with LaTeX / BibTeX:
 ```
