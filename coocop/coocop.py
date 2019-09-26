@@ -21,9 +21,9 @@ class Copyout:
         if not image_buffer_size > 0:
             raise ValueError('"image_buffer_size" must be > 0')
 
-        self.extent = extent
-        self.image_buffer_size = image_buffer_size
-        self.image_buffer = []
+        self._extent = extent
+        self._image_buffer_size = image_buffer_size
+        self._image_buffer = []
 
     def __call__(self, img):
         """
@@ -44,17 +44,17 @@ class Copyout:
         x = np.random.randint(w)
         y = np.random.randint(h)
 
-        x1 = np.clip(x - self.extent // 2, 0, w)
-        x2 = np.clip(x + self.extent // 2, 0, w)
-        y1 = np.clip(y - self.extent // 2, 0, h)
-        y2 = np.clip(y + self.extent // 2, 0, h)
+        x1 = np.clip(x - self._extent // 2, 0, w)
+        x2 = np.clip(x + self._extent // 2, 0, w)
+        y1 = np.clip(y - self._extent // 2, 0, h)
+        y2 = np.clip(y + self._extent // 2, 0, h)
 
         copyout_y_size = y2 - y1
         copyout_x_size = x2 - x1
         copyout_y = np.random.randint(h - copyout_y_size)
         copyout_x = np.random.randint(w - copyout_x_size)
 
-        image_buffer_len = len(self.image_buffer)
+        image_buffer_len = len(self._image_buffer)
         img_copy = np.copy(img)
 
         # only augment when we have images in the buffer
@@ -63,12 +63,12 @@ class Copyout:
             image_buffer_index = np.random.randint(image_buffer_len)
 
             # buffer is full
-            if image_buffer_len >= self.image_buffer_size:
-                old_img = self.image_buffer.pop(image_buffer_index)
+            if image_buffer_len >= self._image_buffer_size:
+                old_img = self._image_buffer.pop(image_buffer_index)
 
             # buffer still needs to be filled
             else:
-                old_img = self.image_buffer[image_buffer_index]
+                old_img = self._image_buffer[image_buffer_index]
 
             # do the copying
             img[y1: y2, x1: x2, :] = old_img[copyout_y: copyout_y + copyout_y_size,
@@ -76,7 +76,7 @@ class Copyout:
                                              :]
 
         # append source image to buffer
-        self.image_buffer.append(img_copy)
+        self._image_buffer.append(img_copy)
 
         return img
 
@@ -109,17 +109,17 @@ class CopyPairing(tensorflow.keras.callbacks.Callback):
         if not image_buffer_size > 0:
             raise ValueError('"image_buffer_size" must be > 0')
 
-        self.extent = extent
-        self.warmup_epochs = warmup_epochs
-        self.fine_tuning_epoch = fine_tuning_epoch
-        self.coo_epochs = coo_epochs
-        self.cop_epochs = cop_epochs
-        self.image_buffer_size = image_buffer_size
+        self._extent = extent
+        self._warmup_epochs = warmup_epochs
+        self._fine_tuning_epoch = fine_tuning_epoch
+        self._coo_epochs = coo_epochs
+        self._cop_epochs = cop_epochs
+        self._image_buffer_size = image_buffer_size
 
-        self.image_buffer = []
-        self.coo_count = 0
-        self.cop_count = 0
-        self.current_epoch = 0
+        self._image_buffer = []
+        self._coo_count = 0
+        self._cop_count = 0
+        self._current_epoch = 0
 
     def copyout(self, img, old_img):
         h, w, _ = img.shape
@@ -127,10 +127,10 @@ class CopyPairing(tensorflow.keras.callbacks.Callback):
         x = np.random.randint(w)
         y = np.random.randint(h)
 
-        x1 = np.clip(x - self.extent // 2, 0, w)
-        x2 = np.clip(x + self.extent // 2, 0, w)
-        y1 = np.clip(y - self.extent // 2, 0, h)
-        y2 = np.clip(y + self.extent // 2, 0, h)
+        x1 = np.clip(x - self._extent // 2, 0, w)
+        x2 = np.clip(x + self._extent // 2, 0, w)
+        y1 = np.clip(y - self._extent // 2, 0, h)
+        y2 = np.clip(y + self._extent // 2, 0, h)
 
         copyout_y_size = y2 - y1
         copyout_x_size = x2 - x1
@@ -145,41 +145,41 @@ class CopyPairing(tensorflow.keras.callbacks.Callback):
         return img
 
     def __call__(self, img):
-        image_buffer_len = len(self.image_buffer)
+        image_buffer_len = len(self._image_buffer)
         img_copy = np.copy(img)
 
         # only augment when we have images in the buffer
         # first image will not be augmented
         if image_buffer_len > 0:
             image_buffer_index = np.random.randint(image_buffer_len)
-            if image_buffer_len >= self.image_buffer_size:
-                old_img = self.image_buffer.pop(image_buffer_index)
+            if image_buffer_len >= self._image_buffer_size:
+                old_img = self._image_buffer.pop(image_buffer_index)
             else:
-                old_img = self.image_buffer[image_buffer_index]
-            if self.current_epoch < self.warmup_epochs:
+                old_img = self._image_buffer[image_buffer_index]
+            if self._current_epoch < self._warmup_epochs:
                 # Copyout
                 img = self.copyout(img, old_img)
-            elif self.current_epoch > self.fine_tuning_epoch - 2:
+            elif self._current_epoch > self._fine_tuning_epoch - 2:
                 # Copyout
                 img = self.copyout(img, old_img)
             else:
-                if self.coo_count <= self.coo_epochs - 1:
+                if self._coo_count <= self._coo_epochs - 1:
                     # Copyout
                     img = self.copyout(img, old_img)
-                    self.coo_count += 1
-                elif self.cop_count <= self.cop_epochs - 1:
+                    self._coo_count += 1
+                elif self._cop_count <= self._cop_epochs - 1:
                     # SamplePairing
                     img = np.mean(np.array([img, old_img]), axis=0)
 
-                    self.cop_count += 1
-                    if self.cop_count > self.cop_epochs - 1:
-                        self.coo_count = 0
-                        self.cop_count = 0
+                    self._cop_count += 1
+                    if self._cop_count > self._cop_epochs - 1:
+                        self._coo_count = 0
+                        self._cop_count = 0
 
-        self.image_buffer.append(img_copy)
+        self._image_buffer.append(img_copy)
 
         return img
 
     # TODO test if *args is ok
     def on_epoch_begin(self, epoch, *args):
-        self.current_epoch = epoch
+        self._current_epoch = epoch
