@@ -2,3 +2,5 @@ old
 build
 dist
 coocop.egg-info
+*.pyc
+.pytest_cache
