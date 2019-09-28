@@ -87,7 +87,8 @@ class Copyout:
 class CopyPairing(tensorflow.keras.callbacks.Callback):
 
     def __init__(self, extent,
-                 warmup_epochs, fine_tuning_epoch, coo_epochs, cop_epochs,
+                 warmup_epochs, fine_tuning_epoch,
+                 coo_epochs=1, cop_epochs=1,
                  image_buffer_size=128):
         super().__init__()
 
