@@ -100,6 +100,8 @@ class CopyPairing(tensorflow.keras.callbacks.Callback):
         if not fine_tuning_epoch > 0:
             raise ValueError('"fine_tuning_epoch" must be > 0')
 
+        # TODO maybe check if warmup_epochs < fine_tuning_epoch or something
+
         if not coo_epochs > 0:
             raise ValueError('"coo_epochs" must be > 0')
 
